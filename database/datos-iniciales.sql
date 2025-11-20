@@ -6,9 +6,29 @@ INSERT INTO categorias (nombre, descripcion) VALUES
 ('Accesorios', 'Cables, adaptadores, soportes, fundas');
 
 -- Insertar usuarios (contraseña: "password123" encriptada con bcrypt)
-INSERT INTO usuarios (email, contraseña, nombres, apellidos, rol) VALUES
-('admin@fytech.com', '$2a$10$N7B7eH5Q7eQ7eQ7eQ7eQ7eOQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ', 'Franz', 'Admin', 'ADMIN'),
-('cliente@ejemplo.com', '$2a$10$N7B7eH5Q7eQ7eQ7eQ7eQ7eOQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ7eQ', 'Juan', 'Pérez', 'CLIENTE');
+--HACERLO ATRAVEZ DEL POSTMAN MAS LIMPIO 
+/*
+POST http://localhost:8080/api/auth/registro
+Content-Type: application/json
+
+{
+  "email": "admin@fytech.com",
+  "contraseña": "admin123",
+  "nombres": "Franz", 
+  "apellidos": "Admin",
+  "rol": "ADMIN"
+}
+POST http://localhost:8080/api/auth/registro
+Content-Type: application/json
+
+{
+  "email": "cliente@fytech.com",
+  "contraseña": "cliente123",
+  "nombres": "Juan",
+  "apellidos": "Pérez", 
+  "rol": "CLIENTE"
+}
+*/
 
 -- Insertar productos
 INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, especificaciones) VALUES
