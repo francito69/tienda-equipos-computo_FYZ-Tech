@@ -195,9 +195,493 @@
 - [ ] En caso de rechazo, permite enviar motivo al cliente
 - [ ] Al confirmar, cambia estado del pedido a "Pago confirmado"
 
-## 5. ARQUITECTURA DE PAGOS ESCALABLE
+# 📋 CASOS DE USO - FYZ-TECH
 
-### 5.1 Diseño del Sistema de Pagos
+## 🎯 DIAGRAMA DE CASOS DE USO PRINCIPAL
+
+```
+┌─────────────────┐
+│   Sistema       │
+│   FYZ-TECH      │
+└─────────────────┘
+         │
+         ├─── Gestión de Usuarios
+         ├─── Gestión de Productos
+         ├─── Gestión de Carrito
+         ├─── Proceso de Compra
+         └─── Gestión de Pagos
+```
+
+---
+
+## 5.1. CASOS DE USO - GESTIÓN DE USUARIOS
+
+### **CU-001: Registrar Usuario**
+**ID:** CU-001  
+**Actor:** Usuario Anónimo  
+**Precondición:** El usuario no tiene cuenta en el sistema  
+**Postcondición:** Se crea una nueva cuenta de usuario
+
+**Flujo Principal:**
+1. El usuario selecciona "Registrarse"
+2. El sistema muestra formulario de registro
+3. El usuario ingresa: nombre, apellido, email, contraseña, confirmar contraseña
+4. El usuario envía el formulario
+5. El sistema valida que el email sea único
+6. El sistema valida que las contraseñas coincidan
+7. El sistema crea la cuenta con rol "Cliente"
+8. El sistema muestra mensaje de éxito
+9. El sistema redirige al login
+
+**Flujos Alternativos:**
+- **5a. Email ya existe:** Sistema muestra error "Email ya registrado"
+- **6a. Contraseñas no coinciden:** Sistema muestra error "Las contraseñas no coinciden"
+
+---
+
+### **CU-002: Iniciar Sesión**
+**ID:** CU-002  
+**Actor:** Usuario Registrado  
+**Precondición:** El usuario tiene cuenta creada  
+**Postcondición:** El usuario accede al sistema autenticado
+
+**Flujo Principal:**
+1. El usuario ingresa email y contraseña
+2. El usuario hace clic en "Iniciar Sesión"
+3. El sistema verifica credenciales
+4. El sistema genera token JWT
+5. El sistema redirige al dashboard del usuario
+6. El sistema actualiza carrito temporal si existe
+
+**Flujos Alternativos:**
+- **3a. Credenciales incorrectas:** Sistema muestra error "Email o contraseña incorrectos"
+
+---
+
+### **CU-003: Cerrar Sesión**
+**ID:** CU-003  
+**Actor:** Usuario Autenticado  
+**Precondición:** El usuario tiene sesión activa  
+**Postcondición:** La sesión se cierra correctamente
+
+**Flujo Principal:**
+1. El usuario selecciona "Cerrar Sesión"
+2. El sistema invalida el token JWT
+3. El sistema redirige a la página principal
+4. El sistema limpia datos de sesión del cliente
+
+---
+
+## 5.2. CASOS DE USO - GESTIÓN DE PRODUCTOS
+
+### **CU-004: Agregar Producto (Admin)**
+**ID:** CU-004  
+**Actor:** Administrador  
+**Precondición:** El administrador tiene sesión activa  
+**Postcondición:** Se agrega un nuevo producto al catálogo
+
+**Flujo Principal:**
+1. El administrador accede al panel de gestión
+2. Selecciona "Agregar Producto"
+3. El sistema muestra formulario de producto
+4. Administrador ingresa: nombre, descripción, precio, categoría, stock, imagen, especificaciones técnicas
+5. Administrador envía el formulario
+6. El sistema valida campos requeridos
+7. El sistema guarda el producto en base de datos
+8. El sistema muestra confirmación de éxito
+
+**Flujos Alternativos:**
+- **6a. Campos inválidos:** Sistema muestra errores de validación
+- **6b. Precio negativo:** Sistema muestra error "El precio debe ser positivo"
+
+---
+
+### **CU-005: Editar Producto (Admin)**
+**ID:** CU-005  
+**Actor:** Administrador  
+**Precondición:** El producto existe en el sistema  
+**Postcondición:** El producto se actualiza correctamente
+
+**Flujo Principal:**
+1. Administrador selecciona producto a editar
+2. El sistema muestra formulario con datos actuales
+3. Administrador modifica campos necesarios
+4. Administrador guarda cambios
+5. El sistema valida y actualiza el producto
+6. El sistema muestra confirmación
+
+---
+
+### **CU-006: Eliminar Producto (Admin)**
+**ID:** CU-006  
+**Actor:** Administrador  
+**Precondición:** El producto existe y no tiene órdenes activas  
+**Postcondición:** El producto se elimina del sistema
+
+**Flujo Principal:**
+1. Administrador selecciona producto a eliminar
+2. El sistema muestra confirmación de eliminación
+3. Administrador confirma la acción
+4. El sistema elimina el producto
+5. El sistema muestra mensaje de éxito
+
+---
+
+### **CU-007: Buscar Productos**
+**ID:** CU-007  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El sistema tiene productos disponibles  
+**Postcondición:** Se muestran productos que coinciden con la búsqueda
+
+**Flujo Principal:**
+1. Usuario ingresa término de búsqueda en el buscador
+2. El sistema busca productos por nombre y descripción
+3. El sistema muestra resultados en tiempo real
+4. Usuario puede seleccionar producto para ver detalles
+
+**Flujos Alternativos:**
+- **2a. Sin resultados:** Sistema muestra "No se encontraron productos"
+
+---
+
+### **CU-008: Filtrar Productos por Categoría**
+**ID:** CU-008  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** Existen categorías definidas  
+**Postcondición:** Se muestran productos de la categoría seleccionada
+
+**Flujo Principal:**
+1. Usuario selecciona categoría del filtro
+2. El sistema filtra productos por categoría seleccionada
+3. El sistema muestra productos de esa categoría
+4. Usuario puede navegar entre los resultados
+
+---
+
+### **CU-009: Ver Detalles de Producto**
+**ID:** CU-009  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El producto existe y está disponible  
+**Postcondición:** Se muestran todos los detalles del producto
+
+**Flujo Principal:**
+1. Usuario selecciona producto de la lista
+2. El sistema carga información completa del producto
+3. El sistema muestra: nombre, descripción, precio, imágenes, especificaciones técnicas, stock disponible
+4. Usuario puede agregar producto al carrito
+
+---
+
+## 5.3. CASOS DE USO - GESTIÓN DE CARRITO
+
+### **CU-010: Agregar Producto al Carrito**
+**ID:** CU-010  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El producto existe y tiene stock disponible  
+**Postcondición:** El producto se agrega al carrito
+
+**Flujo Principal:**
+1. Usuario selecciona "Agregar al Carrito" en un producto
+2. El sistema verifica stock disponible
+3. El sistema agrega producto al carrito (cantidad: 1)
+4. El sistema actualiza contador del carrito en header
+5. El sistema muestra mensaje de confirmación
+
+**Flujos Alternativos:**
+- **2a. Sin stock:** Sistema muestra error "Producto agotado"
+- **2b. Ya en carrito:** Sistema incrementa cantidad si hay stock
+
+---
+
+### **CU-011: Modificar Cantidad en Carrito**
+**ID:** CU-011  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El producto está en el carrito  
+**Postcondición:** Se actualiza la cantidad del producto
+
+**Flujo Principal:**
+1. Usuario accede al carrito de compras
+2. Usuario modifica cantidad en input numérico
+3. El sistema valida que nueva cantidad ≤ stock disponible
+4. El sistema actualiza cantidad y recalcula subtotal
+5. El sistema actualiza total general del carrito
+
+**Flujos Alternativos:**
+- **3a. Stock insuficiente:** Sistema muestra stock máximo disponible
+- **3b. Cantidad = 0:** Sistema elimina producto del carrito
+
+---
+
+### **CU-012: Eliminar Producto del Carrito**
+**ID:** CU-012  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El producto está en el carrito  
+**Postcondición:** El producto se elimina del carrito
+
+**Flujo Principal:**
+1. Usuario accede al carrito de compras
+2. Usuario selecciona "Eliminar" en el producto
+3. El sistema muestra confirmación
+4. Usuario confirma eliminación
+5. El sistema remueve producto del carrito
+6. El sistema actualiza total y contador
+
+---
+
+### **CU-013: Ver Carrito de Compras**
+**ID:** CU-013  
+**Actor:** Usuario (Autenticado o Anónimo)  
+**Precondición:** El carrito tiene al menos un producto  
+**Postcondición:** Se muestra resumen del carrito
+
+**Flujo Principal:**
+1. Usuario selecciona icono del carrito
+2. El sistema muestra lista de productos en carrito
+3. Para cada producto muestra: imagen, nombre, precio unitario, cantidad, subtotal
+4. El sistema muestra total general
+5. El sistema muestra botón "Proceder al Checkout"
+
+---
+
+## 5.4. CASOS DE USO - PROCESO DE COMPRA
+
+### **CU-014: Iniciar Checkout**
+**ID:** CU-014  
+**Actor:** Usuario Autenticado  
+**Precondición:** El usuario tiene productos en el carrito  
+**Postcondición:** Se inicia el proceso de checkout
+
+**Flujo Principal:**
+1. Usuario selecciona "Proceder al Checkout"
+2. El sistema valida que carrito no esté vacío
+3. El sistema valida stock de todos los productos
+4. El sistema muestra formulario de checkout
+5. Usuario ingresa: dirección de envío, información de contacto
+6. El sistema muestra resumen de compra y total
+
+**Flujos Alternativos:**
+- **2a. Carrito vacío:** Sistema redirige a página de productos
+- **3a. Stock insuficiente:** Sistema notifica y actualiza carrito
+
+---
+
+### **CU-015: Confirmar Pedido**
+**ID:** CU-015  
+**Actor:** Usuario Autenticado  
+**Precondición:** El usuario completó datos de envío  
+**Postcondición:** Se crea la orden de pedido
+
+**Flujo Principal:**
+1. Usuario revisa resumen de compra
+2. Usuario selecciona método de pago
+3. Usuario hace clic en "Confirmar Pedido"
+4. El sistema crea orden con estado "Pendiente de pago"
+5. El sistema reserva stock de productos
+6. El sistema vacía el carrito
+7. El sistema redirige a proceso de pago según método seleccionado
+
+---
+
+## 5.5. CASOS DE USO - SISTEMA DE PAGOS
+
+### **CU-016: Pagar con Yape**
+**ID:** CU-016  
+**Actor:** Usuario Autenticado  
+**Precondición:** Existe una orden pendiente de pago  
+**Postcondición:** Se genera código QR y se inicia proceso de pago
+
+**Flujo Principal:**
+1. Usuario selecciona "Pagar con Yape"
+2. El sistema genera código QR con: monto total, número de pedido, información de la empresa
+3. El sistema muestra número de celular para transferencia manual
+4. El sistema muestra instrucciones para el pago
+5. El sistema cambia estado de orden a "Esperando pago Yape"
+6. El sistema muestra formulario para subir comprobante
+
+---
+
+### **CU-017: Subir Comprobante Yape**
+**ID:** CU-017  
+**Actor:** Usuario Autenticado  
+**Precondición:** El usuario realizó el pago con Yape  
+**Postcondición:** Se sube comprobante para verificación
+
+**Flujo Principal:**
+1. Usuario selecciona "Subir Comprobante"
+2. El sistema muestra selector de archivos
+3. Usuario selecciona archivo (JPG, PNG, PDF)
+4. El sistema valida tipo y tamaño (≤5MB)
+5. El sistema sube el archivo
+6. El sistema muestra preview del comprobante
+7. El sistema cambia estado a "Pago pendiente de verificación"
+8. El sistema notifica a administradores
+
+**Flujos Alternativos:**
+- **4a. Archivo inválido:** Sistema muestra error "Formato no soportado"
+- **4b. Archivo muy grande:** Sistema muestra error "Archivo muy grande"
+
+---
+
+### **CU-018: Verificar Pago Yape (Admin)**
+**ID:** CU-018  
+**Actor:** Administrador  
+**Precondición:** Existen órdenes con pago pendiente de verificación  
+**Postcondición:** Se verifica el comprobante de pago
+
+**Flujo Principal:**
+1. Administrador accede a panel de verificaciones pendientes
+2. El sistema muestra lista de órdenes con comprobantes
+3. Administrador selecciona orden para verificar
+4. El sistema muestra comprobante subido y detalles de la orden
+5. Administrador verifica comprobante contra datos de la orden
+6. Administrador selecciona "Confirmar Pago" o "Rechazar Pago"
+7. El sistema actualiza estado de la orden y notifica al usuario
+
+---
+
+### **CU-019: Confirmar Pago Yape (Admin)**
+**ID:** CU-019  
+**Actor:** Administrador  
+**Precondición:** El comprobante es válido y coincide con la orden  
+**Postcondición:** El pago se confirma y la orden avanza
+
+**Flujo Principal:**
+1. Administrador selecciona "Confirmar Pago"
+2. El sistema cambia estado de orden a "Pago confirmado"
+3. El sistema notifica al usuario por email
+4. El sistema prepara orden para envío
+5. El sistema registra auditoría de la transacción
+
+---
+
+### **CU-020: Rechazar Pago Yape (Admin)**
+**ID:** CU-020  
+**Actor:** Administrador  
+**Precondición:** El comprobante es inválido o no coincide  
+**Postcondición:** El pago se rechaza y se notifica al usuario
+
+**Flujo Principal:**
+1. Administrador selecciona "Rechazar Pago"
+2. El sistema solicita motivo del rechazo
+3. Administrador ingresa motivo
+4. El sistema cambia estado de orden a "Pago rechazado"
+5. El sistema notifica al usuario con el motivo
+6. El sistema libera stock reservado
+7. El usuario puede intentar el pago nuevamente
+
+---
+
+## 5.6. CASOS DE USO - GESTIÓN DE ÓRDENES
+
+### **CU-021: Ver Historial de Pedidos (Usuario)**
+**ID:** CU-021  
+**Actor:** Usuario Autenticado  
+**Precondición:** El usuario tiene órdenes realizadas  
+**Postcondición:** Se muestra historial de pedidos del usuario
+
+**Flujo Principal:**
+1. Usuario accede a "Mis Pedidos"
+2. El sistema muestra lista de órdenes del usuario
+3. Para cada orden muestra: número, fecha, total, estado actual
+4. Usuario puede seleccionar orden para ver detalles completos
+5. El sistema muestra detalles: productos, cantidades, dirección, historial de estados
+
+---
+
+### **CU-022: Ver Todas las Órdenes (Admin)**
+**ID:** CU-022  
+**Actor:** Administrador  
+**Precondición:** Existen órdenes en el sistema  
+**Postcondición:** Se muestran todas las órdenes del sistema
+
+**Flujo Principal:**
+1. Administrador accede a "Gestión de Órdenes"
+2. El sistema muestra lista completa de órdenes
+3. El sistema permite filtrar por estado, fecha, usuario
+4. Administrador puede buscar órdenes por número o usuario
+5. Administrador puede ver detalles completos de cualquier orden
+
+---
+
+### **CU-023: Actualizar Estado de Orden (Admin)**
+**ID:** CU-023  
+**Actor:** Administrador  
+**Precondición:** La orden existe y tiene pago confirmado  
+**Postcondición:** El estado de la orden se actualiza
+
+**Flujo Principal:**
+1. Administrador selecciona orden a actualizar
+2. El sistema muestra estado actual y opciones disponibles
+3. Administrador selecciona nuevo estado (Enviado, Entregado, etc.)
+4. El sistema actualiza estado de la orden
+5. El sistema registra fecha/hora del cambio
+6. El sistema notifica al usuario del cambio de estado
+
+---
+
+## 5.7. CASOS DE USO - SISTEMA DE PAGOS ESCALABLE
+
+### **CU-024: Agregar Nuevo Método de Pago (Sistema)**
+**ID:** CU-024  
+**Actor:** Sistema/Desarrollador  
+**Precondición:** Se requiere integrar nuevo gateway de pago  
+**Postcondición:** El nuevo método de pago está disponible
+
+**Flujo Principal:**
+1. Desarrollador implementa nueva clase que cumple con PaymentGateway interface
+2. Se configuran parámetros del nuevo gateway en sistema
+3. Se actualiza base de datos para soportar nuevo método
+4. Se actualiza frontend para mostrar nueva opción
+5. Se realizan pruebas de integración
+6. Se despliega en producción
+
+---
+
+### **CU-025: Procesar Pago con Múltiples Métodos**
+**ID:** CU-025  
+**Actor:** Sistema  
+**Precondición:** Existen múltiples gateways configurados  
+**Postcondición:** El pago se procesa según método seleccionado
+
+**Flujo Principal:**
+1. Sistema identifica método de pago seleccionado
+2. Sistema instancia el gateway correspondiente
+3. Sistema ejecuta flujo específico del método
+4. Sistema procesa respuesta del gateway
+5. Sistema actualiza estado de la orden según resultado
+6. Sistema registra transacción en auditoría
+
+---
+
+## 📊 MATRIZ DE ACTORES Y CASOS DE USO
+
+| Actor | Casos de Uso |
+|-------|-------------|
+| **Usuario Anónimo** | CU-001, CU-007, CU-008, CU-009, CU-010, CU-011, CU-012, CU-013 |
+| **Usuario Autenticado** | CU-002, CU-003, CU-007 a CU-017, CU-021 |
+| **Administrador** | CU-004, CU-005, CU-006, CU-018, CU-019, CU-020, CU-022, CU-023 |
+| **Sistema** | CU-024, CU-025 |
+
+---
+
+## 🔄 RELACIONES ENTRE CASOS DE USO
+
+### **Inclusión (Include):**
+- CU-014 incluye CU-013 (Ver carrito antes de checkout)
+- CU-016 incluye CU-015 (Confirmar pedido antes de pago)
+
+### **Extensión (Extend):**
+- CU-018 extiende CU-022 (Verificación de pagos desde gestión de órdenes)
+- CU-023 extiende CU-022 (Actualización de estado desde gestión de órdenes)
+
+### **Herencia:**
+- Todos los métodos de pago futuros heredan de CU-025
+- CU-019 y CU-020 son especializaciones de CU-018
+
+
+## 6. ARQUITECTURA DE PAGOS ESCALABLE
+
+### 6.1 Diseño del Sistema de Pagos
 ```
 Sistema de Pagos FYZ-Tech
 │
@@ -219,7 +703,7 @@ Sistema de Pagos FYZ-Tech
     └── Auditoría de transacciones
 ```
 
-### 5.2 Flujo de Pago con Yape
+### 6.2 Flujo de Pago con Yape
 1. **Selección de método** → Usuario elige "Pagar con Yape"
 2. **Generación de QR** → Sistema crea QR con datos del pedido
 3. **Pago usuario** → Usuario escanea y paga con Yape
@@ -227,13 +711,13 @@ Sistema de Pagos FYZ-Tech
 5. **Verificación admin** → Admin valida comprobante
 6. **Confirmación** → Sistema actualiza estado del pedido
 
-### 5.3 Preparación para Métodos Futuros
+### 6.3 Preparación para Métodos Futuros
 - **Base de datos:** Campos para múltiples gateways
 - **API:** Endpoints genéricos para procesamiento de pagos
 - **Frontend:** Componente modular para diferentes métodos
 - **Backend:** Patrón Strategy para gateways de pago
 
-## 6. DEFINICIÓN DE TERMINADO
+##7. DEFINICIÓN DE TERMINADO
 
 ### Para cada User Story:
 - [ ] Código desarrollado y probado
