@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.hibernate.annotations.Type;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 
 @Entity
 @Table(name = "ordenes")
@@ -21,6 +23,7 @@ public class Orden {
     @Column(nullable = false)
     private String estado = "PENDIENTE";
 
+    @Type(JsonType.class)
     @Column(name = "direccion_envio", columnDefinition = "JSONB")
     private String direccionEnvio;
 

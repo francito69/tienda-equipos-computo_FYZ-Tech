@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.hibernate.annotations.Type;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 
 @Entity
 @Table(name = "productos")
@@ -28,6 +30,7 @@ public class Producto {
     @Column(name = "imagen_url")
     private String imagenUrl;
 
+    @Type(JsonType.class)
     @Column(columnDefinition = "JSONB")
     private String especificaciones;
 
