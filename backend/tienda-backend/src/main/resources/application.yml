@@ -1,0 +1,21 @@
+# backend/src/main/resources/application.yml
+app:
+  upload:
+    dir: uploads
+    max-file-size: 5MB
+  yape:
+    phone: 987126753
+    business-name: "FYZ Tech Store"
+    
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+# Configuración de logging para debugging
+logging:
+  level:
+    com.fyztech.tienda.service.PagoService: DEBUG
+    com.fyztech.tienda.controller.PagoController: DEBUG
+    
