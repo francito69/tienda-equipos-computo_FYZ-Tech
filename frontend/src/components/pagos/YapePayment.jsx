@@ -18,7 +18,8 @@ import {
   QrCode2, 
   Upload, 
   Verified, 
-  Payment 
+  Payment,
+  CheckCircle
 } from '@mui/icons-material';
 import { pagoService } from '../../services/api';
 
@@ -80,7 +81,8 @@ const YapePayment = ({ ordenId, montoTotal, onPaymentSuccess }) => {
     setError('');
     
     try {
-      const response = await pagoService.generarQRYape(ordenId);
+      // Usar tu QR personalizado - cambia "mi_yape_qr.png" por el nombre de tu archivo
+      const response = await pagoService.crearPagoConQR(ordenId, 'mi_yape_qr.png');
       setQrData(response.data);
       setActiveStep(1);
       
@@ -164,33 +166,39 @@ const YapePayment = ({ ordenId, montoTotal, onPaymentSuccess }) => {
         return (
           <Box textAlign="center" py={3}>
             <Typography variant="h6" gutterBottom>
-              Escanea el QR con Yape
+              Escanea este QR con Yape
             </Typography>
             
             {qrData && (
               <Box mt={2}>
                 <Paper elevation={3} sx={{ p: 2, display: 'inline-block', mb: 2 }}>
                   <img 
-                    src={qrData.qrCodeUrl} 
+                    src={`http://localhost:8080${qrData.qrImageUrl}`} 
                     alt="QR Yape" 
-                    style={{ width: 200, height: 200 }}
+                    style={{ width: 250, height: 250 }}
+                    onError={(e) => {
+                      e.target.src = '/placeholder-qr.png'; // Fallback image
+                    }}
                   />
                 </Paper>
                 
-                <Card variant="outlined" sx={{ mb: 3 }}>
+                <Card variant="outlined" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
                   <CardContent>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Instrucciones:
+                      💡 Instrucciones:
                     </Typography>
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                    <Typography variant="body2" sx={{ whiteSpace: 'pre-line', textAlign: 'left' }}>
                       {qrData.instrucciones}
                     </Typography>
                     <Divider sx={{ my: 2 }} />
                     <Typography variant="body2">
-                      <strong>Concepto:</strong> {qrData.concepto}
+                      <strong>📱 Número Yape:</strong> {qrData.numeroCelular}
                     </Typography>
                     <Typography variant="body2">
-                      <strong>Monto:</strong> S/ {qrData.monto}
+                      <strong>💰 Monto exacto:</strong> S/ {qrData.monto}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>📝 Concepto:</strong> {qrData.concepto}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -224,6 +232,7 @@ const YapePayment = ({ ordenId, montoTotal, onPaymentSuccess }) => {
                   onClick={subirComprobante}
                   disabled={loading}
                   sx={{ mt: 1 }}
+                  startIcon={loading ? <CircularProgress size={20} /> : <Upload />}
                 >
                   {loading ? 'Subiendo...' : 'Confirmar Subida'}
                 </Button>
@@ -270,6 +279,7 @@ const YapePayment = ({ ordenId, montoTotal, onPaymentSuccess }) => {
                   variant="contained" 
                   onClick={subirComprobante}
                   disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : <Upload />}
                 >
                   {loading ? 'Subiendo...' : 'Subir Comprobante'}
                 </Button>
@@ -298,7 +308,7 @@ const YapePayment = ({ ordenId, montoTotal, onPaymentSuccess }) => {
       case 4:
         return (
           <Box textAlign="center" py={4}>
-            <Verified sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+            <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom color="success.main">
               ¡Pago Verificado!
             </Typography>

@@ -2,8 +2,8 @@
 import api from './config';
 
 export const pagoService = {
-  generarQRYape: (ordenId) => 
-    api.post(`/pagos/orden/${ordenId}/generar-qr`),
+  crearPagoConQR: (ordenId, qrImageName) => 
+    api.post(`/pagos/orden/${ordenId}/crear-con-qr?qrImageName=${qrImageName}`),
   
   subirComprobante: (ordenId, comprobante) => {
     const formData = new FormData();
@@ -26,5 +26,7 @@ export const pagoService = {
     api.get('/pagos/pendientes'),
   
   obtenerPagosPorEstado: (estado) => 
-    api.get(`/pagos/estado/${estado}`)
+    api.get(`/pagos/estado/${estado}`),
+  
+  healthCheck: () => api.get('/pagos/health')
 };
