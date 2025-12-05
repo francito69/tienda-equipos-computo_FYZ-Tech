@@ -1,0 +1,47 @@
+<div class="detail-container" *ngIf="!isLoading && product">
+    <button (click)="goBack()" class="back-button">
+        ← Volver a productos
+    </button>
+
+    <div class="product-detail">
+        <div class="product-image-section">
+            <img [src]="product.imgUrl" [alt]="product.name" class="product-image" />
+        </div>
+
+        <div class="product-info-section">
+            <h1 class="product-title">{{ product.name }}</h1>
+
+            <div class="product-price">
+                {{ formatPrice(product.price) }}
+            </div>
+
+            <div class="product-description">
+                <h3>Descripción</h3>
+                <p>{{ product.descr }}</p>
+            </div>
+
+            <div class="quantity-section">
+                <h3>Cantidad</h3>
+                <div class="quantity-controls">
+                    <button (click)="decreaseQuantity()" class="qty-button">−</button>
+                    <span class="quantity-display">{{ quantity }}</span>
+                    <button (click)="increaseQuantity()" class="qty-button">+</button>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <button (click)="addToCart()" class="add-to-cart-button">
+                    🛒 Añadir al Carrito
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="loading">
+    Cargando producto...
+</div>
+
+<div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+</div>

@@ -1,0 +1,93 @@
+<div class="admin-container">
+    <header class="admin-header">
+        <h1>Panel de Administración</h1>
+        <button (click)="logout()" class="logout-button">Cerrar Sesión</button>
+    </header>
+
+    <div class="admin-content">
+        <div class="actions-bar">
+            <button (click)="showForm = !showForm" class="create-button">
+                ➕ Crear Producto
+            </button>
+        </div>
+
+        <!-- Modal Backdrop -->
+        <div *ngIf="showForm" class="modal-backdrop" (click)="resetForm()">
+            <!-- Modal Content -->
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Nuevo Producto</h2>
+                    <button class="close-button" (click)="resetForm()">✕</button>
+                </div>
+
+                <form (ngSubmit)="onSubmit()" class="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Nombre del Producto</label>
+                            <input type="text" id="name" [(ngModel)]="productName" name="name" required
+                                [disabled]="isSubmitting" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Precio (S/.)</label>
+                            <input type="number" id="price" [(ngModel)]="productPrice" name="price" step="0.01" min="0"
+                                required [disabled]="isSubmitting" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descr">Descripción</label>
+                        <textarea id="descr" [(ngModel)]="productDescr" name="descr" rows="4" required
+                            [disabled]="isSubmitting"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Imagen del Producto</label>
+                        <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" required
+                            [disabled]="isSubmitting" />
+                        <div *ngIf="imagePreview" class="image-preview">
+                            <img [src]="imagePreview" alt="Preview" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-button" [disabled]="isSubmitting">
+                        {{ isSubmitting ? 'Creando...' : 'Crear Producto' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="products-section">
+            <h2>Mis Productos</h2>
+
+            <div *ngIf="isLoading" class="loading">
+                Cargando productos...
+            </div>
+
+            <div *ngIf="errorMessage" class="error-message">
+                {{ errorMessage }}
+            </div>
+
+            <div class="products-grid" *ngIf="!isLoading && !errorMessage">
+                <div *ngFor="let product of products" class="product-card">
+                    <div class="product-image">
+                        <img [src]="product.imgUrl" [alt]="product.name" />
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <p class="description">{{ product.descr }}</p>
+                        <p class="price">{{ formatPrice(product.price) }}</p>
+                        <button (click)="deleteProduct(product.id)" class="delete-button">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!isLoading && products.length === 0 && !errorMessage" class="no-products">
+                No tienes productos creados aún
+            </div>
+        </div>
+    </div>
+</div>
