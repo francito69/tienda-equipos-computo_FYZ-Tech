@@ -1,0 +1,88 @@
+<div class="orders-container">
+    <header class="orders-header">
+        <h1>📦 Órdenes de Compra</h1>
+    </header>
+
+    <div *ngIf="isLoading" class="loading">
+        Cargando órdenes...
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="orders-content">
+        <div *ngIf="orders.length === 0" class="no-orders">
+            No hay órdenes registradas
+        </div>
+
+        <div *ngIf="orders.length > 0" class="orders-table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let order of orders" class="order-row">
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.customer_email }}</td>
+                        <td>{{ order.customer_phone }}</td>
+                        <td class="address-cell">{{ order.delivery_address }}</td>
+                        <td class="price-cell">{{ formatPrice(order.total) }}</td>
+                        <td>
+                            <button (click)="viewProducts(order)" class="view-button">
+                                Ver Productos
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Order Items -->
+    <div *ngIf="showModal" class="modal-backdrop" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Productos de la Orden #{{ selectedOrder?.id }}</h2>
+                <button class="close-button" (click)="closeModal()">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <div *ngIf="selectedOrder" class="order-info">
+                    <p><strong>Cliente:</strong> {{ selectedOrder.customer_name }}</p>
+                    <p><strong>Total:</strong> {{ formatPrice(selectedOrder.total) }}</p>
+                </div>
+
+                <div *ngIf="isLoadingItems" class="loading-items">
+                    Cargando productos...
+                </div>
+
+                <div *ngIf="!isLoadingItems && selectedOrderItems.length > 0" class="order-items">
+                    <div *ngFor="let item of selectedOrderItems" class="order-item">
+                        <div class="item-image">
+                            <img [src]="item.productImgUrl" [alt]="item.productName" />
+                        </div>
+                        <div class="item-details">
+                            <h3>{{ item.productName }}</h3>
+                            <p class="item-price">{{ formatPrice(item.productPrice) }} c/u</p>
+                            <p class="item-quantity">Cantidad: {{ item.quantity }}</p>
+                        </div>
+                        <div class="item-subtotal">
+                            <p class="subtotal-label">Subtotal</p>
+                            <p class="subtotal-price">{{ formatPrice(getSubtotal(item)) }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

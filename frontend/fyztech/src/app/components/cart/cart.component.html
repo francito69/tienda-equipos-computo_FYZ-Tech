@@ -1,0 +1,113 @@
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>🛒 Mi Carrito</h1>
+        <button (click)="continueShopping()" class="continue-button">
+            ← Seguir Comprando
+        </button>
+    </div>
+
+    <div *ngIf="cartItems.length === 0" class="empty-cart">
+        <div class="empty-icon">🛒</div>
+        <h2>Tu carrito está vacío</h2>
+        <p>¡Agrega productos para comenzar tu compra!</p>
+        <button (click)="continueShopping()" class="shop-button">
+            Ver Productos
+        </button>
+    </div>
+
+    <!-- Checkout Form Modal -->
+    <div *ngIf="showCheckoutForm" class="modal-backdrop" (click)="cancelCheckout()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Datos de Entrega</h2>
+                <button class="close-button" (click)="cancelCheckout()">✕</button>
+            </div>
+
+            <form (ngSubmit)="confirmPurchase()" class="checkout-form">
+                <div class="form-group">
+                    <label for="name">Nombre Completo</label>
+                    <input type="text" id="name" [(ngModel)]="customerName" name="name" required
+                        [disabled]="isSubmitting" placeholder="Juan Pérez" />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" [(ngModel)]="customerEmail" name="email" required
+                        [disabled]="isSubmitting" placeholder="juan@email.com" />
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Teléfono</label>
+                    <input type="tel" id="phone" [(ngModel)]="customerPhone" name="phone" required
+                        [disabled]="isSubmitting" placeholder="999 999 999" />
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Dirección de Entrega</label>
+                    <textarea id="address" [(ngModel)]="deliveryAddress" name="address" rows="3" required
+                        [disabled]="isSubmitting" placeholder="Av. Principal 123, Lima"></textarea>
+                </div>
+
+                <div class="form-total">
+                    <span>Total a Pagar:</span>
+                    <span class="total-amount">{{ formatPrice(total) }}</span>
+                </div>
+
+                <button type="submit" class="submit-order-button" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Procesando...' : 'Confirmar Compra' }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div *ngIf="cartItems.length > 0 && !showCheckoutForm" class="cart-content">
+        <div class="cart-items">
+            <div *ngFor="let item of cartItems" class="cart-item">
+                <div class="item-image">
+                    <img [src]="item.product.imgUrl" [alt]="item.product.name" />
+                </div>
+
+                <div class="item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p class="item-description">{{ item.product.descr }}</p>
+                    <p class="item-price">{{ formatPrice(item.product.price) }} c/u</p>
+                </div>
+
+                <div class="item-quantity">
+                    <button (click)="decreaseQuantity(item.product.id)" class="qty-btn">−</button>
+                    <span class="qty-display">{{ item.quantity }}</span>
+                    <button (click)="increaseQuantity(item.product.id)" class="qty-btn">+</button>
+                </div>
+
+                <div class="item-subtotal">
+                    <p class="subtotal-label">Subtotal</p>
+                    <p class="subtotal-price">{{ formatPrice(getSubtotal(item)) }}</p>
+                </div>
+
+                <button (click)="removeItem(item.product.id)" class="remove-btn">
+                    🗑️
+                </button>
+            </div>
+        </div>
+
+        <div class="cart-summary">
+            <h2>Resumen del Pedido</h2>
+
+            <div class="summary-row">
+                <span>Productos ({{ cartItems.length }})</span>
+                <span>{{ formatPrice(total) }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <span>{{ formatPrice(total) }}</span>
+            </div>
+
+            <button (click)="proceedToCheckout()" class="checkout-button">
+                Proceder al Pago
+            </button>
+        </div>
+    </div>
+</div>
