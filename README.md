@@ -61,27 +61,23 @@ tienda-equipos-computo_FYZ-Tech/
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
-- **React.js** - Biblioteca de interfaz de usuario
+- **Angular** - Biblioteca de interfaz de usuario
 - **HTML5/CSS3** - Estructura y estilos
 - **JavaScript (ES6+)** - Lógica del cliente
 
 ### Backend
-- **Node.js** - Entorno de ejecución
-- **Express.js** - Framework web
+- **Springboot** - Entorno de ejecución
 - **JWT** - Autenticación
 
 ### Base de Datos
-- **MySQL** - Base de datos relacional
+- **Supabase-PostgreSQL** - Base de datos relacional
 
 ### Infraestructura
-- **Docker** - Contenedores
-- **Docker Compose** - Orquestación
 - **Git/GitHub** - Control de versiones
 
 ## 🚀 Configuración y Desarrollo
 
 ### Prerrequisitos
-- Docker y Docker Compose instalados
 - Node.js 16+ (para desarrollo local)
 - Git
 
@@ -96,11 +92,6 @@ cd tienda-equipos-computo_FYZ-Tech
 # Ejecutar el proyecto
 docker-compose up -d
 ```
-
-El proyecto estará disponible en:
-- **Frontend:** http://localhost:3000
-- **Backend:** http://localhost:3001
-- **Base de datos:** localhost:3306
 
 ## 📞 Contacto y Comunicación
 - **Repositorio:** [[GitHub - tienda-equipos-computo_FYZ-Tech](https://github.com/francito69/tienda-equipos-computo_FYZ-Tech)]
