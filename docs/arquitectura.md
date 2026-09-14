@@ -301,29 +301,24 @@ public class PagoController {
 
 ### 4.1 docker-compose.yml
 ```yaml
-version: '3.8'
-
 services:
   # Frontend - Angular
   frontend:
     build: 
-      context: ./frontend
+      context: ./frontend/fyztech
       dockerfile: Dockerfile
     container_name: fytech-frontend
     ports:
-      - "4200:4200"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "4200:4000"
     environment:
-      - NODE_ENV=development
+      - PORT=4000
     depends_on:
       - backend
 
   # Backend - Spring Boot
   backend:
     build:
-      context: ./backend
+      context: ./backend/PC3-CS1
       dockerfile: Dockerfile
     container_name: fytech-backend
     ports:
@@ -335,8 +330,6 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       - db
-    volumes:
-      - ./backend:/app
 
   # Base de datos - PostgreSQL (Simulación Supabase local)
   db:

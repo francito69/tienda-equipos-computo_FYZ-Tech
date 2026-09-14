@@ -29,14 +29,16 @@ tienda-equipos-computo_FYZ-Tech/
 │   └── actas-reuniones/
 │
 ├── 📁 backend/                       # Código del backend
-│   ├── src/
-│   ├── package.json
-│   └── Dockerfile
+│   └── PC3-CS1/
+│       ├── src/
+│       ├── pom.xml
+│       └── Dockerfile
 │
 ├── 📁 frontend/                      # Código del frontend
-│   ├── src/
-│   ├── package.json
-│   └── Dockerfile
+│   └── fyztech/
+│       ├── src/
+│       ├── package.json
+│       └── Dockerfile
 │
 ├── 📁 database/                      # Scripts de base de datos
 │   ├── esquema.sql
@@ -78,19 +80,40 @@ tienda-equipos-computo_FYZ-Tech/
 ## 🚀 Configuración y Desarrollo
 
 ### Prerrequisitos
-- Node.js 16+ (para desarrollo local)
+- Docker Desktop con Docker Compose
 - Git
 
 ### Ejecución con Docker
 ```bash
-# Clonar el repositorio
-git clone https://github.com/[usuario]/tienda-equipos-computo_FYZ-Tech.git
+# Clonar el repositorio (si aún no lo tienes)
+git clone https://github.com/francito69/tienda-equipos-computo_FYZ-Tech.git
 
-# Navegar al directorio
+# Navegar al directorio del proyecto
 cd tienda-equipos-computo_FYZ-Tech
 
-# Ejecutar el proyecto
-docker-compose up -d
+# Construir las imágenes y levantar frontend, backend, PostgreSQL y pgAdmin
+docker compose up --build -d
+```
+
+La aplicación queda disponible en:
+
+- Frontend: http://localhost:4200
+- Backend: http://localhost:8080
+- pgAdmin: http://localhost:5050
+
+Para ver los logs o detener los servicios:
+
+```bash
+docker compose logs -f
+docker compose down
+```
+
+Los scripts de `database/` se ejecutan únicamente al crear el volumen de
+PostgreSQL por primera vez. Para recrear la base de datos desde cero:
+
+```bash
+docker compose down -v
+docker compose up --build -d
 ```
 
 ## 📞 Contacto y Comunicación
